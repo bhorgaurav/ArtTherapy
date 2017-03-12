@@ -8,15 +8,16 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.media.MediaPlayer;
+import android.os.AsyncTask;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements MediaPlayer.OnPreparedListener {
 
     private CanvasView canvasView;
-
+    private MediaPlayer mp;
     private SensorManager mSensorManager;
     private float mAccel; // acceleration apart from gravity
     private float mAccelCurrent; // current acceleration including gravity
@@ -38,7 +39,6 @@ public class MainActivity extends AppCompatActivity {
             if (mAccel > 12) {
                 canvasView.eraseEverything();
                 try {
-                    MediaPlayer mp = MediaPlayer.create(MainActivity.this, R.raw.eraser);
                     mp.start();
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -55,6 +55,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mp = MediaPlayer.create(MainActivity.this, R.raw.eraser);
+        mp.setOnPreparedListener(this);
 
         canvasView = (CanvasView) findViewById(R.id.canvas_view);
 
@@ -81,5 +84,10 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
         mSensorManager.unregisterListener(sensorListener);
         unregisterReceiver(listener);
+    }
+
+    @Override
+    public void onPrepared(MediaPlayer mediaPlayer) {
+        mp.start();
     }
 }
